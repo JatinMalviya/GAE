@@ -1,0 +1,179 @@
+<!DOCTYPE html>
+{% autoescape true %}
+
+<html lang="en">
+  <head  >
+    <meta charset="utf-8">
+    <meta http-equiv="X-UA-Compatible" content="IE=edge">
+    <meta name="viewport" content="width=device-width, initial-scale=1">
+    <title>ReserveBook: Resource Reservation Application</title>
+    <link href="/bootstrap/css/bootstrap.min.css" rel="stylesheet">
+    <link href="/bootstrap/css/ie10-viewport-bug-workaround.css" rel="stylesheet">
+    <link href="navbar-fixed-top.css" rel="stylesheet">
+    <script src="/bootstrap/js/ie-emulation-modes-warning.js"></script>
+  </head>
+
+  <body data-spy="scroll" data-target="#navigationbar">
+
+    <nav id="navigationbar" class="navbar navbar-inverse navbar-fixed-top navbar-light">
+		<div class="container">
+        
+			<div id="navbar" class="navbar-collapse collapse">
+				<ul class="nav navbar-nav">
+					<li class="active"><a href="#home">Home</a></li>
+					<li><a href="#myreservations">My Reservations</a></li>
+					<li><a href="#allresources">All Resources</a></li>
+					<li><a href="#myresources">My Resources</a></li>
+					<li><a href="#createresource">Create Resource</a></li>
+				</ul>
+				<ul class="nav navbar-nav navbar-right">
+					<li><a href="#"><span class="glyphicon glyphicon-user"></span> {{ nickname }}</a></li>
+					<li><a href="{{ url_logout|safe }}"><span class="glyphicon glyphicon-log-out"></span> Logout</a></li>
+				</ul>
+			</div>
+		</div>
+    </nav>
+
+    <div id="home" class="container">
+
+		<div class="jumbotron" style="background-color: #3c434f; color: white;">
+			<center><h1 class="display-3">ReserveBook</h1></center>
+			<center><p class="lead">Book, Manage & Create Reservations.</p></center>
+			<hr class="my-4">
+		</div>
+    </div>
+	
+	<div id="myreservations" class="container">
+
+		<div class="jumbotron" >
+			<center><h2>My Reservations</h2></center>
+		</div>
+	  
+		<table class="table table-hover table-striped table-responsive">
+			<thead class="thead-default bg-primary text-white">
+				<tr>
+					<th>Resource Name</th>
+					<th>Time</th>
+					<th>Duration</th>
+					<th>User</th>
+					<th>Modify</th>
+				</tr>
+			</thead>
+			<tbody>
+				{% if user_reservations %}
+					{% for reservation in user_reservations %}
+						<tr>
+							<th scope="row"><a href="/Resource?resourceId={{ reservation.resourceId }}">{{ reservation.resourceName }}</a></th>
+							<td>{{ reservation.startTime }} - {{ reservation.endTime }}</td>
+							<td>{{ reservation.duration }}</td>
+							<td><a href="/User?user={{ reservation.user }}">{{ reservation.user }}</a></td>
+							<td><a class="btn btn-primary" href="/DeleteReservation?reservationId={{ reservation.reservationId }}" role="button">Delete</a>
+						</tr>
+					{% endfor %}
+				{% endif %}
+			</tbody>
+		</table>
+
+    </div>
+	<hr class="my-4">
+	
+	<div id="allresources" class="container">
+
+		<div class="jumbotron">
+			<center><h2>All Resources</h2></center>
+		</div>
+	  
+		<table class="table table-hover table-striped table-responsive">
+			<thead class="thead-default bg-primary text-white">
+				<tr>
+					<th>Resource Name</th>
+					<th>Availability</th>
+					<th>Tags</th>
+					<th>Last Reservation Time</th>
+					<th>Total Bookings</th>
+				</tr>
+			</thead>
+			<tbody>
+				{% if all_resources %}
+					{% for resource in all_resources %}
+						<tr>
+							<th scope="row"><a href="/Resource?resourceId={{ resource.resourceId }}">{{ resource.resourceName }}</a></th>
+							<td>{{ resource.startTime }} - {{ resource.endTime }}</td>
+							<td>{% for tag in resource.tags %} <a href="/Tag?tag={{ tag }}">{{ tag }}</a>{% endfor %}</td>
+							<td>{{ resource.lastReservationTime }}</td>
+							<td>{{ resource.count }}</td>
+						</tr>
+					{% endfor %}
+				{% endif %}
+			</tbody>
+		</table>
+
+    </div>	
+	<hr class="my-4">
+	
+	<div id="myresources" class="container">
+
+		<div class="jumbotron">
+			<center><h2>My Resources</h2></center>
+		</div>
+	  
+		<table class="table table-hover table-striped table-responsive">
+			<thead class="thead-default bg-primary text-white">
+				<tr>
+					<th>Resource Name</th>
+					<th>Availability</th>
+					<th>Tags</th>
+					<th>Last Reservation Time</th>
+					<th>Total Bookings</th>
+				</tr>
+			</thead>
+			<tbody>
+				{% if user_resources %}
+					{% for resource in user_resources %}
+						<tr>
+							<th scope="row"><a href="/Resource?resourceId={{ resource.resourceId }}">{{ resource.resourceName }}</a></th>
+							<td>{{ resource.startTime }} - {{ resource.endTime }}</td>
+							<td>{% for tag in resource.tags %} <a href="/Tag?tag={{ tag }}">{{ tag }}</a>{% endfor %}</td>
+							<td>{{ resource.lastReservationTime }}</td>
+							<td>{{ resource.count }}</td>
+						</tr>
+					{% endfor %}
+				{% endif %}
+			</tbody>
+		</table>
+
+    </div>
+
+    </div>
+	<hr class="my-4">
+	
+	<div id="createresource" class="container">
+
+		<div class="jumbotron">
+			<p>
+				<center><a class="btn btn-lg btn-primary" href="/AddResource" role="button">Create A New Resource &raquo;</a></center>
+			</p>
+		</div>
+
+    </div>
+
+
+    <!-- Bootstrap core JavaScript
+    ================================================== -->
+    <!-- Placed at the end of the document so the pages load faster -->
+    <script src="https://ajax.googleapis.com/ajax/libs/jquery/1.12.4/jquery.min.js"></script>
+    <script>window.jQuery || document.write('<script src="../../assets/js/vendor/jquery.min.js"><\/script>')</script>
+    <script src="bootstrap/js/bootstrap.min.js"></script>
+    <!-- IE10 viewport hack for Surface/desktop Windows 8 bug -->
+    <script src="bootstrap/js/ie10-viewport-bug-workaround.js"></script>
+	<script>
+		$(".nav li").on("click", function() {
+		$(".nav li").removeClass("active");
+		$(this).addClass("active");
+		});
+	</script>
+		
+  </body>
+</html>
+
+{% endautoescape %}

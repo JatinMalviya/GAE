@@ -1,0 +1,17 @@
+runtime: python27
+threadsafe: yes
+api_version: 1
+
+handlers:
+- url: /bootstrap
+  static_dir: bootstrap
+- url: /.*
+  script: main.app
+
+  
+  
+libraries:
+- name: webapp2
+  version: latest
+- name: jinja2
+  version: latest
