@@ -1,0 +1,135 @@
+<!DOCTYPE html>
+{% autoescape true %}
+<html lang="en">
+	<head  >
+		<meta charset="utf-8">
+		<meta http-equiv="X-UA-Compatible" content="IE=edge">
+		<meta name="viewport" content="width=device-width, initial-scale=1">
+		<title>ReserveBook: Add Reservation {{ resource.resourceName }}</title>
+		<link href="/bootstrap/css/bootstrap.min.css" rel="stylesheet">
+		<link href="/bootstrap/css/ie10-viewport-bug-workaround.css" rel="stylesheet">
+		<link href="navbar-fixed-top.css" rel="stylesheet">
+		<script src="/bootstrap/js/ie-emulation-modes-warning.js"></script>
+	</head>
+	<body>
+  
+		<nav id="navigationbar" class="navbar navbar-inverse navbar-light">
+  
+			<a class="navbar-brand" href="/">ReserveBook</a>
+			<div class="container">
+        
+				<div id="navbar" class="navbar-collapse collapse">
+					<ul class="nav navbar-nav navbar-right">
+						<li><a href="/"><span class="glyphicon glyphicon-home"></span> Home</a></li>
+						<li><a href="#"><span class="glyphicon glyphicon-user"></span> {{ nickname }}</a></li>
+						<li><a href="{{ url_logout|safe }}"><span class="glyphicon glyphicon-log-out"></span> Logout</a></li>
+					</ul>
+				</div>
+			</div>
+		</nav>
+	
+		<div id="Top" class="container">
+
+			<div class="jumbotron" style="background-color: #3c434f; color: white;">
+				<center><h1 class="display-3">Make Reservation For: <a href="/Resource?resourceId={{ resource.resourceId }}">{{ resource.resourceName }}</a></h1></center>
+				<center><p class="lead">Availability: {{ resource.startTime }} - {{ resource.endTime }}</p></center>
+				<hr class="my-4">
+			</div>
+		</div>
+	
+		<div id="Bootom" class="container">
+			<div class="jumbotron">
+				<form name="addReservationForm" action="/AddReservation?resourceId={{ resource.resourceId }}" method="post" onsubmit="return validateForm()">
+	 
+					<div class="form-group">
+						<label for="startTime">Start Time*</label>
+						<input type="text" required class="form-control" name="startTime" value="{{ startTime }}" id="startTime" aria-describedby="startTimeHelp" placeholder="mm-dd-yyyy HH:MM">
+						<small id="startTimeHelp" class="form-text text-muted">Enter the Start Time (Date & Time) for the new Reservation.</small>
+					</div>
+		
+					<div class="form-group">
+						<label for="duration">Duration*</label>
+						<input type="text" required class="form-control" name="duration" value="{{ duration }}" id="duration" aria-describedby="sdurationHelp" placeholder="HH:MM">
+						<small id="durationHelp" class="form-text text-muted">Enter the Reservation Duration. Must be between 00:00 - 23:59.</small>
+					</div>
+		
+					<button type="submit" class="btn btn-primary">Submit</button>
+				</form>
+			</div>
+		</div>
+		  
+		<!-- Bootstrap core JavaScript
+		================================================== -->
+		<!-- Placed at the end of the document so the pages load faster -->
+		<script src="https://ajax.googleapis.com/ajax/libs/jquery/1.12.4/jquery.min.js"></script>
+		<script>window.jQuery || document.write('<script src="../../assets/js/vendor/jquery.min.js"><\/script>')</script>
+		<script src="bootstrap/js/bootstrap.min.js"></script>
+		<!-- IE10 viewport hack for Surface/desktop Windows 8 bug -->
+		<script src="bootstrap/js/ie10-viewport-bug-workaround.js"></script>
+	
+		<script>
+			function validateForm() {
+		
+				var reservationStartTime = document.forms["addReservationForm"]["startTime"].value;
+				var reservationStartTimeFormat = /^[0-1][0-9]-[0-3][0-9]-[0-9][0-9][0-9][0-9] [0-2][0-9]:[0-5][0-9]$/;
+				if(!reservationStartTime.match(reservationStartTimeFormat)) {
+					alert("Wrong Format for Start Time. Must be a valid date & time and in format 'mm-dd-yyyy HH:MM'.");
+					return false;
+				}
+						
+				var duration = document.forms["addReservationForm"]["duration"].value;
+				var durationFormat = /^[0-2][0-9]:[0-5][0-9]$/;
+				if(!duration.match(durationFormat)) {
+					alert("Wrong Format for Duration time. Must be between 00:00 - 23:59 and in format HH:MM.");
+					return false;
+				}
+					
+				var datePart = reservationStartTime.split(' ')[0];
+				var dateMonth = parseInt(datePart.split('-')[0]);
+				var dateDay = parseInt(datePart.split('-')[1]);
+				var dateYear = parseInt(datePart.split('-')[2]);
+				
+				if(dateMonth > 12 || dateDay > 31) {
+					alert("Invalid Date in Start Time.");
+					return false;
+				}
+				
+				var resourceStartTime = "{{resource.startTime}}";
+				var resourceEndTime = "{{resource.endTime}}";
+				var resourceStartHour = parseInt(resourceStartTime.split(':')[0]);
+				var resourceStartMin = parseInt(resourceStartTime.split(':')[1]);
+				var resourceEndHour = parseInt(resourceEndTime.split(':')[0]);
+				var resourceEndMin = parseInt(resourceEndTime.split(':')[1]);
+				
+				var reservationStartHour = parseInt(reservationStartTime.split(' ')[1].split(':')[0]);
+				var reservationStartMin = parseInt(reservationStartTime.split(' ')[1].split(':')[1]);
+				var reservationEndHour = reservationStartHour + parseInt(duration.split(':')[0]);
+				var reservationEndMin = reservationStartMin + parseInt(duration.split(':')[1]);
+				
+				if(reservationEndMin >= 60) {
+				
+					reservationEndHour = reservationEndHour + 1;
+					reservationEndMin = reservationEndMin - 60;
+				} 
+				
+				if(reservationEndHour > 23) {
+					alert("Reservation cannot cross Day Boundary. Check Duration.");
+					return false;
+				}
+				
+				if( reservationStartHour <  resourceStartHour 
+				|| (reservationStartHour == resourceStartHour && reservationStartMin < resourceStartMin)
+				|| reservationEndHour > resourceEndHour
+				|| (reservationEndHour == resourceEndHour && reservationEndMin > resourceEndMin)) {
+					
+					alert("Reservation is or has a part out of Resource availability hours. Check the Start Time & Duration.");
+					return false;
+				}
+
+			}
+		</script>
+		
+	</body>
+</html>
+
+{% endautoescape %}
