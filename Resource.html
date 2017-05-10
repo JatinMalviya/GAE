@@ -6,6 +6,7 @@
 		<meta charset="utf-8">
 		<meta http-equiv="X-UA-Compatible" content="IE=edge">
 		<meta name="viewport" content="width=device-width, initial-scale=1">
+		<link rel="shortcut icon" type ="image/x-icon" href="/images/favicon.ico">
 		<title>ReserveBook: Resource {{ resource.resourceName }}</title>
 		<link href="/bootstrap/css/bootstrap.min.css" rel="stylesheet">
 		<link href="/bootstrap/css/ie10-viewport-bug-workaround.css" rel="stylesheet">
@@ -34,8 +35,12 @@
 				<center><h1 class="display-3">Resource: <a href="/Resource?resourceId={{ resource.resourceId }}">{{ resource.resourceName }}</a></h1></center>
 				<center><p class="lead">Availability: {{ resource.startTime }} - {{ resource.endTime }}</p></center>
 				<center><p class="lead">Total Reservations: {{ resource.count }}</p></center>
+				<center><p class="lead">Tags: {% for tag in resource.tags %} <a href="/Tag?tag={{ tag }}">{{ tag }}</a>{% endfor %}</td>
 				<center><p class="lead">Owner: <a href="/User?user={{ resource.owner }}">{{ resource.owner }}</a></p></center>
 				<center><p class="lead">Last Reservation Made At: {{ resource.lastReservationTime }}</p></center>
+				{% if rss_flag%}
+					<center><a class="btn" href="/GenerateRss?resourceId={{ resource.resourceId }}" role="button"><img src="/images/RSS_ICON.png" alt="Generate RSS Feed" height="30" width="30" alt=""></a></center>
+				{% endif %}
 				<hr class="my-4">
 			</div>
 		</div>
@@ -87,15 +92,6 @@
 
 		</div>
 	
-		<!-- Bootstrap core JavaScript
-		================================================== -->
-		<!-- Placed at the end of the document so the pages load faster -->
-		<script src="https://ajax.googleapis.com/ajax/libs/jquery/1.12.4/jquery.min.js"></script>
-		<script>window.jQuery || document.write('<script src="../../assets/js/vendor/jquery.min.js"><\/script>')</script>
-		<script src="bootstrap/js/bootstrap.min.js"></script>
-		<!-- IE10 viewport hack for Surface/desktop Windows 8 bug -->
-		<script src="bootstrap/js/ie10-viewport-bug-workaround.js"></script>
-		
 	</body>
 </html>
 

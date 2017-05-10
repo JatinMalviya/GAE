@@ -7,19 +7,17 @@
 		<meta http-equiv="X-UA-Compatible" content="IE=edge">
 		<meta name="viewport" content="width=device-width, initial-scale=1">
 		<link rel="shortcut icon" type ="image/x-icon" href="/images/favicon.ico">
-		<title>ReserveBook: Create Resource</title>
+		<title>ReserveBook: RSS Feed For Resource {{ resource.resourceName }}</title>
 		<link href="/bootstrap/css/bootstrap.min.css" rel="stylesheet">
 		<link href="/bootstrap/css/ie10-viewport-bug-workaround.css" rel="stylesheet">
 		<link href="navbar-fixed-top.css" rel="stylesheet">
 		<script src="/bootstrap/js/ie-emulation-modes-warning.js"></script>
 	</head>
-	
 	<body>
   
 		<nav id="navigationbar" class="navbar navbar-inverse navbar-light">
   
 			<a class="navbar-brand" href="/">ReserveBook</a>
-		
 			<div class="container">
 				<div id="navbar" class="navbar-collapse collapse">
 					<ul class="nav navbar-nav navbar-right">
@@ -32,40 +30,20 @@
 		</nav>
 	
 		<div id="Top" class="container">
+
 			<div class="jumbotron" style="background-color: #3c434f; color: white;">
-				<center><h1 class="display-3">Resources with Tag: <a href="/Tag?tag={{tag}}">{{ tag }}</a></h1></center>
+				<center><h1 class="display-3">RSS Feed for Resource: <a href="/Resource?resourceId={{ resource.resourceId }}">{{ resource.resourceName }}</a></h1></center>
 				<hr class="my-4">
 			</div>
 		</div>
-	
-		<div id="Bottom" class="container">
-			<table class="table table-hover table-striped table-responsive">
-				<thead class="thead-default bg-primary text-white">
-					<tr>
-						<th>Resource Name</th>
-						<th>Availability</th>
-						<th>Tags</th>
-						<th>Last Reservation Time</th>
-						<th>Total Bookings</th>
-					</tr>
-				</thead>
-				<tbody>
-					{% if tagged_resources %}
-						{% for resource in tagged_resources %}
-							<tr>
-								<th scope="row"><a href="/Resource?resourceId={{ resource.resourceId }}">{{ resource.resourceName }}</a></th>
-								<td>{{ resource.startTime }} - {{ resource.endTime }}</td>
-								<td>{% for tag in resource.tags %} <a href="/Tag?tag={{tag}}">{{ tag }}</a>{% endfor %}</td>
-								<td>{{ resource.lastReservationTime }}</td>
-								<td>{{ resource.count }}</td>
-							</tr>
-						{% endfor %}
-					{% endif %}
-				</tbody>
-			</table>
+		
+		<div id="bottom" class="container" >
+			<div class="jumbotron">
+				<pre style="background-color: #f0f5f5;">{{ rss_string }}</pre>
+			</div>
 		</div>
-			
-  </body>
+		
+	</body>
 </html>
 
 {% endautoescape %}

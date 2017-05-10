@@ -9,6 +9,8 @@ import time
 import uuid
 import logging
 
+RSS_FLAG = True;
+
 JINJA_ENVIRONMENT = jinja2.Environment(
     loader=jinja2.FileSystemLoader(os.path.dirname(__file__)),
     extensions=['jinja2.ext.autoescape'],
@@ -99,7 +101,8 @@ class MainPage(webapp2.RequestHandler):
 				'url_logout': url_logout,
 				'user_resources': user_resources,
 				'all_resources': all_resources,
-				'user_reservations': user_reservations
+				'user_reservations': user_reservations,
+				'rss_flag': RSS_FLAG
 				}
 			template = JINJA_ENVIRONMENT.get_template('Index.html')
 			self.response.write(template.render(template_values))
@@ -242,7 +245,8 @@ class ResourcePage(webapp2.RequestHandler):
 				'nickname' : nickname,
 				'resource': resource,
 				'reservations' : reservations,
-				'url_logout': url_logout
+				'url_logout': url_logout,
+				'rss_flag': RSS_FLAG
 				}
 			
 			template = JINJA_ENVIRONMENT.get_template('Resource.html')
@@ -337,7 +341,6 @@ class DeleteReservationPage(webapp2.RequestHandler):
 class UserPage(webapp2.RequestHandler):
 
     def get(self):
-        #Checks for active Google session
         user = users.get_current_user()
         if user:
 			nickname = user.nickname()
@@ -358,6 +361,65 @@ class UserPage(webapp2.RequestHandler):
 			self.response.write(template.render(template_values))
         else:
             self.redirect(users.create_login_url(self.request.uri))
+			
+class GenerateRssPage(webapp2.RequestHandler):
+
+    def get(self):
+		user = users.get_current_user()
+		if user:
+			nickname = user.nickname()
+			url_logout = users.create_logout_url(self.request.uri);
+			resourceId = self.request.GET['resourceId']
+			resource = getResourceById(resourceId);
+			reservations = getReservationsByResource(resource);
+			
+			rssString = "<?xml version=\"1.0\" encoding=\"UTF-8\" ?>\n";
+			rssString += "<rss version=\"2.0\">\n";
+			rssString += "<channel>\n";
+			rssString += "\t<Resource>\n";
+			rssString += "\t\t<ResourceId>" + resource.resourceId + "</ResourceId\n";
+			rssString += "\t\t<ResourceName>" + resource.resourceName + "</ResourceName>\n";
+			rssString += "\t\t<Availability>\n";
+			rssString += "\t\t\t<StartTime>" + str(resource.startTime) + "</StartTime>\n";
+			rssString += "\t\t\t<EndTime>" + str(resource.endTime) + "</EndTime>\n";
+			rssString += "\t\t</Availability>\n";
+			rssString += "\t\t<TotalReservations>" + str(resource.count) + "</TotalReservations>\n";
+			rssString += "\t\t<Owner>" + resource.owner + "</Owner>\n";
+			rssString += "\t\t<LastReservationTime>" + str(resource.lastReservationTime) + "</LastReservationTime>\n";
+			
+			rssString += "\t\t<Tags>\n";
+			for t in resource.tags:
+				rssString += "\t\t\t<Tag>" + str(t).strip() + "</Tag>\n";
+			rssString += "\t\t</Tags>\n";
+			
+			rssString += "\t\t<Reservations>\n";
+			for r in reservations:
+				rssString += "\t\t\t<Reservation>\n";
+				rssString += "\t\t\t\t<ReservationId>" + r.reservationId + "</ReservationId>\n";
+				rssString += "\t\t\t\t<StartTime>" + str(r.startTime) + "</StartTime>\n";
+				rssString += "\t\t\t\t<EndTime>" + str(r.endTime) + "</EndTime>\n";
+				rssString += "\t\t\t\t<Duration>" + str(r.duration) + "</Duration>\n";
+				rssString += "\t\t\t\t<ReservationTime>" + str(r.reservationTime) + "</ReservationTime>\n";
+				rssString += "\t\t\t\t<User>" + r.user + "</User>\n";
+				rssString += "\t\t\t</Reservation>\n";
+			rssString += "\t\t</Reservations>\n";
+			
+			rssString += "\t</Resource>\n";
+			rssString += "</channel>\n";
+			rssString += "</rss>\n";
+			
+			template_values = {
+				'resource': resource,
+				'rss_string': rssString,
+				'nickname' : nickname,
+				'url_logout': url_logout,
+				'user': user,
+				'user_email': user.email()
+				}
+			template = JINJA_ENVIRONMENT.get_template('Rss.html')
+			self.response.write(template.render(template_values))
+		else:
+			self.redirect(users.create_login_url(self.request.uri))
 
 app = webapp2.WSGIApplication([
     ('/', MainPage),
@@ -367,5 +429,6 @@ app = webapp2.WSGIApplication([
 	('/Resource', ResourcePage),
 	('/AddReservation', AddReservationPage),
 	('/DeleteReservation', DeleteReservationPage),
-	('/User', UserPage)
+	('/User', UserPage),
+	('/GenerateRss', GenerateRssPage)
 ], debug=True)

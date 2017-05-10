@@ -5,6 +5,8 @@ api_version: 1
 handlers:
 - url: /bootstrap
   static_dir: bootstrap
+- url: /images
+  static_dir: images
 - url: /.*
   script: main.app
 

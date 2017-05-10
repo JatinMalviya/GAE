@@ -6,6 +6,7 @@
     <meta charset="utf-8">
     <meta http-equiv="X-UA-Compatible" content="IE=edge">
     <meta name="viewport" content="width=device-width, initial-scale=1">
+	<link rel="shortcut icon" type ="image/x-icon" href="/images/favicon.ico">
     <title>ReserveBook: Resource Reservation Application</title>
     <link href="/bootstrap/css/bootstrap.min.css" rel="stylesheet">
     <link href="/bootstrap/css/ie10-viewport-bug-workaround.css" rel="stylesheet">
@@ -91,6 +92,9 @@
 					<th>Tags</th>
 					<th>Last Reservation Time</th>
 					<th>Total Bookings</th>
+					{% if rss_flag%}
+						<th>RSS</th>
+					{% endif %}
 				</tr>
 			</thead>
 			<tbody>
@@ -102,6 +106,9 @@
 							<td>{% for tag in resource.tags %} <a href="/Tag?tag={{ tag }}">{{ tag }}</a>{% endfor %}</td>
 							<td>{{ resource.lastReservationTime }}</td>
 							<td>{{ resource.count }}</td>
+							{% if rss_flag%}
+								<td><a class="btn" href="/GenerateRss?resourceId={{ resource.resourceId }}" role="button"><img src="/images/RSS_ICON.png" alt="Generate RSS Feed" height="25" width="25" alt=""></a></td>
+							{% endif %}
 						</tr>
 					{% endfor %}
 				{% endif %}
@@ -125,6 +132,9 @@
 					<th>Tags</th>
 					<th>Last Reservation Time</th>
 					<th>Total Bookings</th>
+					{% if rss_flag%}
+						<th>RSS</th>
+					{% endif %}
 				</tr>
 			</thead>
 			<tbody>
@@ -136,6 +146,9 @@
 							<td>{% for tag in resource.tags %} <a href="/Tag?tag={{ tag }}">{{ tag }}</a>{% endfor %}</td>
 							<td>{{ resource.lastReservationTime }}</td>
 							<td>{{ resource.count }}</td>
+							{% if rss_flag%}
+								<td><a class="btn" href="/GenerateRss?resourceId={{ resource.resourceId }}" role="button"><img src="/images/RSS_ICON.png" alt="Generate RSS Feed" height="25" width="25" alt=""></a></td>
+							{% endif %}
 						</tr>
 					{% endfor %}
 				{% endif %}
@@ -156,16 +169,7 @@
 		</div>
 
     </div>
-
-
-    <!-- Bootstrap core JavaScript
-    ================================================== -->
-    <!-- Placed at the end of the document so the pages load faster -->
-    <script src="https://ajax.googleapis.com/ajax/libs/jquery/1.12.4/jquery.min.js"></script>
-    <script>window.jQuery || document.write('<script src="../../assets/js/vendor/jquery.min.js"><\/script>')</script>
-    <script src="bootstrap/js/bootstrap.min.js"></script>
-    <!-- IE10 viewport hack for Surface/desktop Windows 8 bug -->
-    <script src="bootstrap/js/ie10-viewport-bug-workaround.js"></script>
+	
 	<script>
 		$(".nav li").on("click", function() {
 		$(".nav li").removeClass("active");
