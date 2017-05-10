@@ -1,0 +1,102 @@
+<!DOCTYPE html>
+{% autoescape true %}
+
+<html lang="en">
+	<head  >
+		<meta charset="utf-8">
+		<meta http-equiv="X-UA-Compatible" content="IE=edge">
+		<meta name="viewport" content="width=device-width, initial-scale=1">
+		<title>ReserveBook: Resource {{ resource.resourceName }}</title>
+		<link href="/bootstrap/css/bootstrap.min.css" rel="stylesheet">
+		<link href="/bootstrap/css/ie10-viewport-bug-workaround.css" rel="stylesheet">
+		<link href="navbar-fixed-top.css" rel="stylesheet">
+		<script src="/bootstrap/js/ie-emulation-modes-warning.js"></script>
+	</head>
+	<body>
+  
+		<nav id="navigationbar" class="navbar navbar-inverse navbar-light">
+  
+			<a class="navbar-brand" href="/">ReserveBook</a>
+			<div class="container">
+				<div id="navbar" class="navbar-collapse collapse">
+					<ul class="nav navbar-nav navbar-right">
+						<li><a href="/"><span class="glyphicon glyphicon-home"></span> Home</a></li>
+						<li><a href="#"><span class="glyphicon glyphicon-user"></span> {{ nickname }}</a></li>
+						<li><a href="{{ url_logout|safe }}"><span class="glyphicon glyphicon-log-out"></span> Logout</a></li>
+					</ul>
+				</div>
+			</div>
+		</nav>
+	
+		<div id="Top" class="container">
+
+			<div class="jumbotron" style="background-color: #3c434f; color: white;">
+				<center><h1 class="display-3">Resource: <a href="/Resource?resourceId={{ resource.resourceId }}">{{ resource.resourceName }}</a></h1></center>
+				<center><p class="lead">Availability: {{ resource.startTime }} - {{ resource.endTime }}</p></center>
+				<center><p class="lead">Total Reservations: {{ resource.count }}</p></center>
+				<center><p class="lead">Owner: <a href="/User?user={{ resource.owner }}">{{ resource.owner }}</a></p></center>
+				<center><p class="lead">Last Reservation Made At: {{ resource.lastReservationTime }}</p></center>
+				<hr class="my-4">
+			</div>
+		</div>
+	
+		<div id="reservations" class="container">
+
+			<div class="jumbotron" >
+				<center><h2>Current & Upcoming Reservations</h2></center>
+			</div>
+	  
+			<table class="table table-hover table-striped table-responsive">
+				<thead class="thead-default bg-primary text-white">
+					<tr>
+						<th>Time</th>
+						<th>Duration</th>
+						<th>User</th>
+					</tr>
+				</thead>
+				<tbody>
+					{% if reservations %}
+						{% for reservation in reservations %}
+							<tr>
+								<td>{{ reservation.startTime }} - {{ reservation.endTime }}</td>
+								<td>{{ reservation.duration }}</td>
+								<td><a href="/User?user={{ reservation.user }}">{{ reservation.user }}</a></td>
+							</tr>
+						{% endfor %}
+					{% endif %}
+				</tbody>
+			</table>
+		</div>
+		<hr class="my-4">
+	
+		<div id="buttons" class="container">
+			<div class="jumbotron">
+				<p>
+				<center><a class="btn btn-lg btn-primary" href="/AddReservation?resourceId={{ resource.resourceId }}" role="button">Make Reservation</a></center>
+				</p>
+				{% if user_email == resource.owner %}
+					<p>
+						<center><a class="btn btn-lg btn-primary" href="/EditResource?resourceId={{ resource.resourceId }}" role="button">Edit Resource</a></center>
+					</p>
+				{% else %}
+					<p>
+						<center><a class="btn btn-lg btn-primary" disabled role="button">Edit Resource</a></center>
+					</p>
+				{% endif %}
+			</div>
+
+		</div>
+	
+		<!-- Bootstrap core JavaScript
+		================================================== -->
+		<!-- Placed at the end of the document so the pages load faster -->
+		<script src="https://ajax.googleapis.com/ajax/libs/jquery/1.12.4/jquery.min.js"></script>
+		<script>window.jQuery || document.write('<script src="../../assets/js/vendor/jquery.min.js"><\/script>')</script>
+		<script src="bootstrap/js/bootstrap.min.js"></script>
+		<!-- IE10 viewport hack for Surface/desktop Windows 8 bug -->
+		<script src="bootstrap/js/ie10-viewport-bug-workaround.js"></script>
+		
+	</body>
+</html>
+
+{% endautoescape %}
