@@ -1,0 +1,122 @@
+<!DOCTYPE html>
+{% autoescape true %}
+<html lang="en">
+	<head>
+		<meta charset="utf-8">
+		<meta http-equiv="X-UA-Compatible" content="IE=edge">
+		<meta name="viewport" content="width=device-width, initial-scale=1">
+		<title>ReserveBook: Edit Resource {{ resource.resourceName }}</title>
+		<link href="/bootstrap/css/bootstrap.min.css" rel="stylesheet">
+		<link href="/bootstrap/css/ie10-viewport-bug-workaround.css" rel="stylesheet">
+		<link href="navbar-fixed-top.css" rel="stylesheet">
+		<script src="/bootstrap/js/ie-emulation-modes-warning.js"></script>
+	</head>
+	
+	<body>
+  
+		<nav id="navigationbar" class="navbar navbar-inverse navbar-light">
+	  
+			<a class="navbar-brand" href="/">ReserveBook</a>
+			<div class="container">
+			
+				<div id="navbar" class="navbar-collapse collapse">
+					<ul class="nav navbar-nav navbar-right">
+						<li><a href="/"><span class="glyphicon glyphicon-home"></span> Home</a></li>
+						<li><a href="#"><span class="glyphicon glyphicon-user"></span> {{ nickname }}</a></li>
+						<li><a href="{{ url_logout|safe }}"><span class="glyphicon glyphicon-log-out"></span> Logout</a></li>
+					</ul>
+				</div>
+			</div>
+		</nav>
+	
+		<div id="Top" class="container">
+
+			<div class="jumbotron" style="background-color: #3c434f; color: white;">
+				<center><h1 class="display-3">Edit Resource: <a href="/Resource?resourceId={{ resource.resourceId }}">{{ resource.resourceName }}</a></h1></center>
+				<hr class="my-4">
+			</div>
+		</div>
+	
+		<div id="Bootom" class="container">
+			<div class="jumbotron">
+				<form name="editResourceForm" action="/EditResource?resourceId={{ resource.resourceId }}" method="post" onsubmit="return validateForm()">
+				 
+					<div class="form-group">
+						<label for="resourceName">Resource Name*</label>
+						<input type="text" required class="form-control" name="resourceName" value="{{ resource.resourceName }}" id="resourceName" aria-describedby="nameHelp" placeholder="Resource Name">
+						<small id="nameHelp" class="form-text text-muted">Enter the name for the new Resource.</small>
+					</div>
+					
+					<div class="form-group">
+						<label for="startTime">Start Time*</label>
+						<input type="text" required class="form-control" name="startTime" value="{{ startTime }}" id="startTime" aria-describedby="startTimeHelp" placeholder="HH:MM">
+						<small id="startTimeHelp" class="form-text text-muted">Enter the start time for the new Resource. Must be between 00:00 - 23:59.</small>
+					</div>
+					
+					<div class="form-group">
+						<label for="endTime">End Time*</label>
+						<input type="text" required class="form-control" name="endTime" value="{{ endTime }}" id="endTime" aria-describedby="endTimeHelp" placeholder="HH:MM">
+						<small id="endTimeHelp" class="form-text text-muted">Enter the end time for the new Resource. Must be between (Start Time) - 23:59.</small>
+					</div>
+					
+					<div class="form-group">
+						<label for="tags">Tags</label>
+						<input type="text" class="form-control" name="tags" value="{{ tags }}" id="tags" aria-describedby="tagsHelp" placeholder="Tag1 Tag2 Tag3">
+						<small id="tagsHelp" class="form-text text-muted">Enter the tags for the new Resource. Space separated.</small>
+					</div>
+
+					<button type="submit" class="btn btn-primary">Submit</button>
+				</form>
+			</div>
+		</div>
+  
+		<!-- Bootstrap core JavaScript
+		================================================== -->
+		<!-- Placed at the end of the document so the pages load faster -->
+		<script src="https://ajax.googleapis.com/ajax/libs/jquery/1.12.4/jquery.min.js"></script>
+		<script>window.jQuery || document.write('<script src="../../assets/js/vendor/jquery.min.js"><\/script>')</script>
+		<script src="bootstrap/js/bootstrap.min.js"></script>
+		<!-- IE10 viewport hack for Surface/desktop Windows 8 bug -->
+		<script src="bootstrap/js/ie10-viewport-bug-workaround.js"></script>
+	
+		<script>
+			function validateForm() {
+			
+				var name = document.forms["editResourceForm"]["resourceName"].value;
+				if(name.replace(/^\s+|\s+$/g, '') == '') {
+					alert("Resource Name cannot be blank.");
+					return false;
+				}
+				var startTime = document.forms["editResourceForm"]["startTime"].value;
+				var endTime = document.forms["editResourceForm"]["endTime"].value;
+				var timeFormat = /^[0-2][0-9]:[0-5][0-9]$/;
+				if(!startTime.match(timeFormat)) {
+					alert("Wrong Format for Start Time. Must be between 00:00 - 23:59 and in format HH:MM.");
+					return false;
+				}
+				
+				if(!endTime.match(timeFormat)) {
+					alert("Wrong Format for End Time. Must be between 00:00 - 23:59 and in format HH:MM.");
+					return false;
+				}
+				
+				
+				var startSplit = startTime.split(':');
+				var startHour = parseInt(startSplit[0]);
+				var startMin = parseInt(startSplit[1]);
+				var endSplit = endTime.split(':');
+				var endHour = parseInt(endSplit[0]);
+				var endMin = parseInt(endSplit[1]);
+
+				if((startHour > endHour) || (startHour == endHour && endMin < startMin)) {
+					alert("Start Time must be less than End Time.");
+					return false;
+				}
+				
+			}
+		</script>
+		
+	</body>
+</html>
+
+{% endautoescape %}
