@@ -57,7 +57,7 @@ def getAllReservations():
 	return allReservations
 	
 def getReservationsByUser(user):
-	reservations_query = Reservation.query(Reservation.user == str(user))
+	reservations_query = Reservation.query(Reservation.user == str(user.email()))
 	reservations = reservations_query.order(Reservation.user).order(Reservation.startTime, Reservation.endTime).fetch()
 	return reservations
 
@@ -192,7 +192,7 @@ class EditResourcePage(webapp2.RequestHandler):
 		resource.endTime = datetime.datetime.strptime(endTime, '%H:%M').time();
 		resource.lastReservationTime = datetime.datetime.now() - datetime.timedelta(hours = 4)
 		resource.tags = tags;
-		resource.owner = str(users.get_current_user());
+		resource.owner = str(users.get_current_user().email());
 		resource.put();
 		for reservation in getReservationsByResource(resource):
 			reservation.resourceName = resource.resourceName;
@@ -290,7 +290,7 @@ class AddReservationPage(webapp2.RequestHandler):
 			reservation.duration = datetime.datetime.strptime(duration, '%H:%M').time()
 			reservation.endTime = reservation.startTime + datetime.timedelta(hours = reservation.duration.hour, minutes = reservation.duration.minute);
 			reservation.reservationTime = datetime.datetime.now() - datetime.timedelta(hours = 4)
-			reservation.user = str(user);
+			reservation.user = str(user.email());
 			reservation.put();
 
 			resource.count = resource.count + 1;
