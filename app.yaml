@@ -7,7 +7,7 @@ handlers:
   static_dir: bootstrap
 - url: /images
   static_dir: images
-- url: /.*
+- url: /\.*
   script: main.app
 
   
