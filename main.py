@@ -32,7 +32,7 @@ def getAllResources():
 	return allResources
 	
 def getResourcesByUser(user):
-    resources_query = Resource.query(Resource.owner == str(user.email()))
+    resources_query = Resource.query(Resource.owner == str(user))
     userResources = resources_query.fetch()
     return userResources
 	
@@ -57,7 +57,7 @@ def getAllReservations():
 	return allReservations
 	
 def getReservationsByUser(user):
-	reservations_query = Reservation.query(Reservation.user == str(user.email()))
+	reservations_query = Reservation.query(Reservation.user == str(user))
 	reservations = reservations_query.order(Reservation.user).order(Reservation.startTime, Reservation.endTime).fetch()
 	return reservations
 
@@ -73,7 +73,7 @@ def getReservationsByResource(resource):
 	
 def getReservationsByUserTime(user):
 	currentTime = datetime.datetime.now() - datetime.timedelta(hours = 4)
-	reservations_query = Reservation.query(Reservation.user == str(user.email()), Reservation.endTime >= currentTime)
+	reservations_query = Reservation.query(Reservation.user == str(user), Reservation.endTime >= currentTime)
 	reservations = reservations_query.order(Reservation.user, Reservation.endTime).order(Reservation.user,Reservation.startTime, Reservation.endTime).fetch()
 	return reservations
 	
@@ -90,8 +90,8 @@ class MainPage(webapp2.RequestHandler):
         if user:
 			nickname = user.nickname()
 			all_resources = getAllResources();
-			user_resources = getResourcesByUser(user);
-			user_reservations = getReservationsByUserTime(user);
+			user_resources = getResourcesByUser(user.email());
+			user_reservations = getReservationsByUserTime(user.email());
 			url_logout = users.create_logout_url(self.request.uri);
 			template_values = {
 				'user': user,
