@@ -32,7 +32,7 @@ def getAllResources():
 	return allResources
 	
 def getResourcesByUser(user):
-    resources_query = Resource.query(Resource.owner == str(user))
+    resources_query = Resource.query(Resource.owner == str(user.email()))
     userResources = resources_query.fetch()
     return userResources
 	
@@ -73,7 +73,7 @@ def getReservationsByResource(resource):
 	
 def getReservationsByUserTime(user):
 	currentTime = datetime.datetime.now() - datetime.timedelta(hours = 4)
-	reservations_query = Reservation.query(Reservation.user == str(user), Reservation.endTime >= currentTime)
+	reservations_query = Reservation.query(Reservation.user == str(user.email()), Reservation.endTime >= currentTime)
 	reservations = reservations_query.order(Reservation.user, Reservation.endTime).order(Reservation.user,Reservation.startTime, Reservation.endTime).fetch()
 	return reservations
 	
