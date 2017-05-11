@@ -75,8 +75,6 @@ def getReservationsByUserTime(user):
 	currentTime = datetime.datetime.now() - datetime.timedelta(hours = 4)
 	reservations_query = Reservation.query(Reservation.user == str(user), Reservation.endTime >= currentTime)
 	reservations = reservations_query.order(Reservation.user, Reservation.endTime).order(Reservation.user,Reservation.startTime, Reservation.endTime).fetch()
-	logging.info("hi");
-	logging.info(reservations);
 	return reservations
 	
 def getReservationsByResourceTime(resource):
@@ -141,10 +139,9 @@ class AddResourcePage(webapp2.RequestHandler):
 		resource.endTime = datetime.datetime.strptime(endTime, '%H:%M').time();
 		resource.lastReservationTime = datetime.datetime.now() - datetime.timedelta(hours = 4)
 		resource.tags = tags;
-		resource.owner = str(users.get_current_user());
+		resource.owner = str(users.get_current_user().email());
 		resource.count = 0;
 		resource.put();
-		logging.info(resource);
 		self.redirect('/');
 		
 class EditResourcePage(webapp2.RequestHandler):
