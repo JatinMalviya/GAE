@@ -295,6 +295,15 @@ class AddReservationPage(webapp2.RequestHandler):
 				error_flag = True;
 				error_msg = "Start Time is before the Current Time. We do not support past reservations."
 			
+			if(not error_flag):
+			
+				userReservations = getReservationsByUser(user.email());
+				
+				for userR in userReservations:
+					if( (startTime >= userR.startTime and startTime < userR.endTime) or
+						(endTime > userR.startTime and endTime <= userR.endTime)):
+							error_flag = True;
+							error_msg = "You already have a reservation coming up during this time interval. Reservations cannot overlap.";
 			
 			if error_flag:
 				template_values = {
