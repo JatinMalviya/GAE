@@ -1,13 +1,13 @@
 import os
-from google.appengine.api import users
-from google.appengine.ext import ndb
-from google.appengine.api import mail
 import jinja2
 import webapp2
 import datetime
 import time
 import uuid
 import logging
+from google.appengine.api import users
+from google.appengine.ext import ndb
+from google.appengine.api import mail
 
 RSS_FLAG = True;
 
@@ -336,6 +336,20 @@ class AddReservationPage(webapp2.RequestHandler):
 				resource.count = resource.count + 1;
 				resource.lastReservationTime = datetime.datetime.now() - datetime.timedelta(hours = 4);
 				resource.put();
+				
+				message = mail.EmailMessage(
+					sender="Admin@reservebook-ost.appspotmail.com",
+					subject="New Reservation");
+
+				message.to = str(user.email());
+    
+				message.body = """Hi """ + user.nickname() + """,
+Your reservation for """ + resource.resourceName + """ at """ + str(reservation.startTime) + """ - """ + str(reservation.endTime) + """ has been Confirmed.
+Thanks.
+ReserveBook"""
+
+				logging.info(message.body);
+				message.send();
 			
 				self.redirect('/');
 			
