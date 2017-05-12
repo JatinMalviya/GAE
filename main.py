@@ -48,7 +48,7 @@ class Reservation(ndb.Model):
 	startTime = ndb.DateTimeProperty(indexed=True)
 	endTime = ndb.DateTimeProperty(indexed=True)
 	duration = ndb.TimeProperty(indexed=False)
-	reservationTime = ndb.DateTimeProperty(indexed=False)
+	reservationTime = ndb.DateTimeProperty(indexed=True)
 	user = ndb.StringProperty(indexed=True)
 	
 def getAllReservations():
@@ -301,7 +301,8 @@ class AddReservationPage(webapp2.RequestHandler):
 				
 				for userR in userReservations:
 					if( (startTime >= userR.startTime and startTime < userR.endTime) or
-						(endTime > userR.startTime and endTime <= userR.endTime)):
+						(endTime > userR.startTime and endTime <= userR.endTime) or
+						( startTime <= userR.startTime and endTime >= userR.endTime)):
 							error_flag = True;
 							error_msg = "You already have a reservation coming up during this time interval. Reservations cannot overlap.";
 			
