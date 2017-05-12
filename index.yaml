@@ -25,11 +25,11 @@ indexes:
 - kind: Reservation
   properties:
   - name: user
-  - name: startTime
   - name: endTime
+  - name: startTime
 
 - kind: Reservation
   properties:
   - name: user
-  - name: endTime
   - name: startTime
+  - name: endTime

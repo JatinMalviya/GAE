@@ -1,0 +1,4 @@
+cron:
+- description: send mail reminders before reservation start time.
+  url: /SendReminderMail
+  schedule: every 1 minutes
