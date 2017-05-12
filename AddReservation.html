@@ -11,8 +11,16 @@
 		<link href="/bootstrap/css/ie10-viewport-bug-workaround.css" rel="stylesheet">
 		<link href="navbar-fixed-top.css" rel="stylesheet">
 		<script src="/bootstrap/js/ie-emulation-modes-warning.js"></script>
+		
+		<script>
+				function errorCheck() {
+					{% if error_flag %}
+						alert("{{ error_msg }}");
+					{% endif %}
+				}
+		</script>
 	</head>
-	<body>
+	<body onload='errorCheck();'>
   
 		<nav id="navigationbar" class="navbar navbar-inverse navbar-light">
   
@@ -44,7 +52,7 @@
 	 
 					<div class="form-group">
 						<label for="startTime">Start Time*</label>
-						<input type="text" required class="form-control" name="startTime" value="{{ startTime }}" id="startTime" aria-describedby="startTimeHelp" placeholder="mm-dd-yyyy HH:MM">
+						<input type="text" required class="form-control" name="startTime" value="{{ start_time }}" id="startTime" aria-describedby="startTimeHelp" placeholder="mm-dd-yyyy HH:MM">
 						<small id="startTimeHelp" class="form-text text-muted">Enter the Start Time (Date & Time) for the new Reservation.</small>
 					</div>
 		
@@ -58,8 +66,10 @@
 				</form>
 			</div>
 		</div>
+		
 		  
 		<script>
+			
 			function validateForm() {
 		
 				var reservationStartTime = document.forms["addReservationForm"]["startTime"].value;

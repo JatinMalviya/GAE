@@ -277,27 +277,58 @@ class AddReservationPage(webapp2.RequestHandler):
 	def post(self):
 		user = users.get_current_user()
 		if user:
+			nickname = user.nickname()
+			url_logout = users.create_logout_url(self.request.uri)
 			resourceId = self.request.GET['resourceId']
 			resource = getResourceById(resourceId);
 			
-			reservation = Reservation();
-			reservation.reservationId = str(uuid.uuid4());
-			reservation.resourceId = resource.resourceId;
-			reservation.resourceName = resource.resourceName;
-			startTime = self.request.get('startTime');
-			reservation.startTime = datetime.datetime.strptime(startTime, '%m-%d-%Y %H:%M');
-			duration = self.request.get('duration');
-			reservation.duration = datetime.datetime.strptime(duration, '%H:%M').time()
-			reservation.endTime = reservation.startTime + datetime.timedelta(hours = reservation.duration.hour, minutes = reservation.duration.minute);
-			reservation.reservationTime = datetime.datetime.now() - datetime.timedelta(hours = 4)
-			reservation.user = str(user.email());
-			reservation.put();
-
-			resource.count = resource.count + 1;
-			resource.lastReservationTime = datetime.datetime.now() - datetime.timedelta(hours = 4);
-			resource.put();
+			startTimeString = self.request.get('startTime');
+			startTime = datetime.datetime.strptime(startTimeString, '%m-%d-%Y %H:%M');
+			durationString = self.request.get('duration');
+			duration = datetime.datetime.strptime(durationString, '%H:%M').time();
+			endTime = startTime + datetime.timedelta(hours = duration.hour, minutes = duration.minute);
+			reservationTime = datetime.datetime.now() - datetime.timedelta(hours = 4);
 			
-			self.redirect('/');
+			error_flag = False;
+			
+			if(startTime < reservationTime):
+				error_flag = True;
+				error_msg = "Start Time is before the Current Time. We do not support past reservations."
+			
+			
+			if error_flag:
+				template_values = {
+					'user': user,
+					'user_email': user.email(),
+					'nickname' : nickname,
+					'resource': resource,
+					'url_logout': url_logout,
+					'start_time': startTimeString,
+					'duration': durationString,
+					'error_flag': error_flag,
+					'error_msg': error_msg
+				}
+			
+				template = JINJA_ENVIRONMENT.get_template('AddReservation.html')
+				self.response.write(template.render(template_values))
+			else :
+			
+				reservation = Reservation();
+				reservation.reservationId = str(uuid.uuid4());
+				reservation.resourceId = resource.resourceId;
+				reservation.resourceName = resource.resourceName;
+				reservation.startTime = startTime;
+				reservation.duration = duration;
+				reservation.endTime = endTime;
+				reservation.reservationTime = reservationTime;
+				reservation.user = str(user.email());
+				reservation.put();
+
+				resource.count = resource.count + 1;
+				resource.lastReservationTime = datetime.datetime.now() - datetime.timedelta(hours = 4);
+				resource.put();
+			
+				self.redirect('/');
 			
 		else:
 			self.redirect(users.create_login_url(self.request.uri))
@@ -330,6 +361,9 @@ class DeleteReservationPage(webapp2.RequestHandler):
 			reservationId = self.request.GET['reservationId']
 			reservation = getReservationById(reservationId);
 			reservation.key.delete();
+			resource = getResourceById(reservation.resourceId);
+			resource.count -= 1;
+			resource.put();
 			self.redirect('/');
 			
 		else:
@@ -374,7 +408,7 @@ class GenerateRssPage(webapp2.RequestHandler):
 			rssString += "<rss version=\"2.0\">\n";
 			rssString += "<channel>\n";
 			rssString += "\t<Resource>\n";
-			rssString += "\t\t<ResourceId>" + resource.resourceId + "</ResourceId\n";
+			rssString += "\t\t<ResourceId>" + resource.resourceId + "</ResourceId>\n";
 			rssString += "\t\t<ResourceName>" + resource.resourceName + "</ResourceName>\n";
 			rssString += "\t\t<Availability>\n";
 			rssString += "\t\t\t<StartTime>" + str(resource.startTime) + "</StartTime>\n";
