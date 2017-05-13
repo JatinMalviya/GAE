@@ -58,11 +58,14 @@
 		
 					<div class="form-group">
 						<label for="duration">Duration*</label>
-						<input type="text" required class="form-control" name="duration" value="{{ duration }}" id="duration" aria-describedby="sdurationHelp" placeholder="HH:MM">
+						<input type="text" required class="form-control" name="duration" value="{{ duration }}" id="duration" aria-describedby="durationHelp" placeholder="HH:MM">
 						<small id="durationHelp" class="form-text text-muted">Enter the Reservation Duration. Must be between 00:00 - 23:59.</small>
 					</div>
 		
-					<button type="submit" class="btn btn-primary">Submit</button>
+					<div class="form-group">
+						<p><button type="submit" class="btn btn-primary" aria-describedby="submitHelp" >Submit</button></p>
+						<small id="submitHelp" class="form-text text-muted">A confirmation mail will be sent.</small>
+					</div>
 				</form>
 			</div>
 		</div>

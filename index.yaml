@@ -20,6 +20,11 @@ indexes:
   properties:
   - name: resourceId
   - name: startTime
+
+- kind: Reservation
+  properties:
+  - name: resourceId
+  - name: startTime
   - name: endTime
 
 - kind: Reservation

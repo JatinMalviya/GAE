@@ -71,6 +71,17 @@ def getReservationsByResource(resource):
 	reservations = reservations_query.order(Reservation.resourceId).order(Reservation.startTime, Reservation.endTime).fetch()
 	return reservations
 	
+def getReservationsByResourceDay(resource, currentTime):
+	currentDayStart = currentTime - datetime.timedelta(hours = currentTime.time().hour, minutes = currentTime.time().minute);
+	reservations_query = Reservation.query(Reservation.resourceId == resource.resourceId, Reservation.startTime >= currentDayStart)
+	reservations = reservations_query.fetch()
+	
+	logging.info(currentDayStart);
+	logging.info(reservations);
+	
+	
+	return reservations
+	
 def getReservationsByUserTime(user):
 	currentTime = datetime.datetime.now() - datetime.timedelta(hours = 4)
 	reservations_query = Reservation.query(Reservation.user == str(user), Reservation.endTime >= currentTime)
@@ -312,7 +323,19 @@ class AddReservationPage(webapp2.RequestHandler):
 						(endTime > userR.startTime and endTime <= userR.endTime) or
 						( startTime <= userR.startTime and endTime >= userR.endTime)):
 							error_flag = True;
-							error_msg = "You already have a reservation coming up during this time interval. Reservations cannot overlap.";
+							error_msg = "You already have a reservation coming up during this requested time interval. Reservations cannot overlap.";
+			
+			if(not error_flag):
+			
+				resourceReservations = getReservationsByResourceDay(resource, startTime);
+				
+				for resourceR in resourceReservations:
+					if( (startTime >= resourceR.startTime and startTime < resourceR.endTime) or
+						(endTime > resourceR.startTime and endTime <= resourceR.endTime) or
+						( startTime <= resourceR.startTime and endTime >= resourceR.endTime)):
+							error_flag = True;
+							error_msg = "Resource already has a reservation for the full or part of the requested time interval. Cannot be Booked";
+			
 			
 			if error_flag:
 				template_values = {
