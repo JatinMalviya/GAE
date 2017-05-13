@@ -517,7 +517,7 @@ class GenerateSearchNamePage(webapp2.RequestHandler):
 				'url_logout': url_logout
 				}
 			
-			template = JINJA_ENVIRONMENT.get_template('searchName.html')
+			template = JINJA_ENVIRONMENT.get_template('SearchName.html')
 			self.response.write(template.render(template_values))
 		else:
 			self.redirect(users.create_login_url(self.request.uri))		
@@ -544,7 +544,7 @@ class GenerateSearchNamePage(webapp2.RequestHandler):
 				'resources': resultResources
 				}
 			
-			template = JINJA_ENVIRONMENT.get_template('searchName.html')
+			template = JINJA_ENVIRONMENT.get_template('SearchName.html')
 			self.response.write(template.render(template_values))
 		else:
 			self.redirect(users.create_login_url(self.request.uri))		
@@ -563,7 +563,7 @@ class GenerateSearchAvailabilityPage(webapp2.RequestHandler):
 				'url_logout': url_logout
 				}
 			
-			template = JINJA_ENVIRONMENT.get_template('searchAvailability.html')
+			template = JINJA_ENVIRONMENT.get_template('SearchAvailability.html')
 			self.response.write(template.render(template_values))
 		else:
 			self.redirect(users.create_login_url(self.request.uri))		
@@ -600,7 +600,7 @@ class GenerateSearchAvailabilityPage(webapp2.RequestHandler):
 				'resources': resultResources
 				}
 			
-			template = JINJA_ENVIRONMENT.get_template('searchAvailability.html')
+			template = JINJA_ENVIRONMENT.get_template('SearchAvailability.html')
 			self.response.write(template.render(template_values))
 		else:
 			self.redirect(users.create_login_url(self.request.uri))		
