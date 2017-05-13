@@ -26,6 +26,7 @@
 					<li><a href="#allresources">All Resources</a></li>
 					<li><a href="#myresources">My Resources</a></li>
 					<li><a href="#createresource">Create Resource</a></li>
+					<li><a href="#searchresources">Search</a></li>
 				</ul>
 				<ul class="nav navbar-nav navbar-right">
 					<li><a href="#"><span class="glyphicon glyphicon-user"></span> {{ nickname }}</a></li>
@@ -165,6 +166,20 @@
 		<div class="jumbotron">
 			<p>
 				<center><a class="btn btn-lg btn-primary" href="/AddResource" role="button">Create A New Resource</a></center>
+			</p>
+		</div>
+
+    </div>
+	<hr class="my-4">
+	
+	<div id="searchresources" class="container">
+
+		<div class="jumbotron">
+			<p>
+				<center><a class="btn btn-lg btn-primary" href="/SearchName" role="button">Search Resource by Name</a></center>
+			</p>
+			<p>
+				<center><a class="btn btn-lg btn-primary" href="/SearchAvailability" role="button">Search Resource by Availability</a></center>
 			</p>
 		</div>
 

@@ -83,6 +83,14 @@ def getReservationsByResourceTime(resource):
 	reservations = reservations_query.order(Reservation.resourceId, Reservation.endTime).order(Reservation.startTime, Reservation.endTime).fetch()
 	return reservations
 	
+def getAllReservationsStartingNow():
+	currentTimeBefore1 = datetime.datetime.now() - datetime.timedelta(hours = 4, minutes = 1)
+	currentTime = datetime.datetime.now() - datetime.timedelta(hours = 4)
+	reservations_query = Reservation.query(Reservation.startTime > currentTimeBefore1, Reservation.startTime <= currentTime);
+	reservations = reservations_query.fetch()
+	return reservations
+
+	
 class MainPage(webapp2.RequestHandler):
 
     def get(self):
@@ -339,7 +347,7 @@ class AddReservationPage(webapp2.RequestHandler):
 				resource.put();
 				
 				message = mail.EmailMessage(
-					sender="Admin@reservebook-ost.appspotmail.com",
+					sender="ReserveBook@reservebook-ost.appspotmail.com",
 					subject="New Reservation");
 
 				message.to = str(user.email());
@@ -349,7 +357,6 @@ Your reservation for """ + resource.resourceName + """ at """ + str(reservation.
 Thanks.
 ReserveBook"""
 
-				logging.info(message.body);
 				message.send();
 			
 				self.redirect('/');
@@ -476,6 +483,128 @@ class GenerateRssPage(webapp2.RequestHandler):
 		else:
 			self.redirect(users.create_login_url(self.request.uri))
 
+			
+class GenerateReminderMail(webapp2.RequestHandler):
+
+	def get(self):
+		reservations = getAllReservationsStartingNow();
+		for reservation in reservations:
+			message = mail.EmailMessage(
+						sender="ReserveBook@reservebook-ost.appspotmail.com",
+						subject="Reservation Starting");
+
+			message.to = str(reservation.user);
+    
+			message.body = """Hi,
+Your reservation for """ + reservation.resourceName + """ is starting Now.
+Thanks.
+ReserveBook"""
+			
+			message.send();
+			
+			
+			
+class GenerateSearchNamePage(webapp2.RequestHandler):
+
+	def get(self):
+		user = users.get_current_user()
+		if user:
+			nickname = user.nickname()
+			url_logout = users.create_logout_url(self.request.uri)
+			template_values = {
+				'user': user,
+				'nickname' : nickname,
+				'url_logout': url_logout
+				}
+			
+			template = JINJA_ENVIRONMENT.get_template('searchName.html')
+			self.response.write(template.render(template_values))
+		else:
+			self.redirect(users.create_login_url(self.request.uri))		
+
+	def post(self):
+		user = users.get_current_user()
+		if user:
+			nickname = user.nickname();
+			url_logout = users.create_logout_url(self.request.uri);
+			searchName = startTimeString = self.request.get('searchName');
+			
+			resources = getAllResources();
+			resultResources = [];
+			
+			for r in resources:
+				if searchName.lower() in r.resourceName.lower():
+					resultResources.append(r);
+			
+			template_values = {
+				'user': user,
+				'nickname' : nickname,
+				'url_logout': url_logout,
+				'searchName': searchName,
+				'resources': resultResources
+				}
+			
+			template = JINJA_ENVIRONMENT.get_template('searchName.html')
+			self.response.write(template.render(template_values))
+		else:
+			self.redirect(users.create_login_url(self.request.uri))		
+					
+					
+class GenerateSearchAvailabilityPage(webapp2.RequestHandler):
+
+	def get(self):
+		user = users.get_current_user()
+		if user:
+			nickname = user.nickname()
+			url_logout = users.create_logout_url(self.request.uri)
+			template_values = {
+				'user': user,
+				'nickname' : nickname,
+				'url_logout': url_logout
+				}
+			
+			template = JINJA_ENVIRONMENT.get_template('searchAvailability.html')
+			self.response.write(template.render(template_values))
+		else:
+			self.redirect(users.create_login_url(self.request.uri))		
+
+	def post(self):
+		user = users.get_current_user()
+		if user:
+			nickname = user.nickname();
+			url_logout = users.create_logout_url(self.request.uri);
+			
+			startTimeString = self.request.get('startTime');
+			startTime = datetime.datetime.strptime(startTimeString, '%H:%M');
+			durationString = self.request.get('duration');
+			duration = datetime.datetime.strptime(durationString, '%H:%M').time();
+			endTime = startTime + datetime.timedelta(hours = duration.hour, minutes = duration.minute);
+			
+			startTime = startTime.time();
+			endTime = endTime.time();
+			
+			
+			resources = getAllResources();
+			resultResources = [];
+			
+			for r in resources:
+				if r.startTime <= startTime and r.endTime >= endTime:
+					resultResources.append(r);
+			
+			template_values = {
+				'user': user,
+				'nickname' : nickname,
+				'url_logout': url_logout,
+				'startTime': startTimeString,
+				'duration': durationString,
+				'resources': resultResources
+				}
+			
+			template = JINJA_ENVIRONMENT.get_template('searchAvailability.html')
+			self.response.write(template.render(template_values))
+		else:
+			self.redirect(users.create_login_url(self.request.uri))		
+			
 app = webapp2.WSGIApplication([
     ('/', MainPage),
 	('/AddResource', AddResourcePage),
@@ -485,5 +614,8 @@ app = webapp2.WSGIApplication([
 	('/AddReservation', AddReservationPage),
 	('/DeleteReservation', DeleteReservationPage),
 	('/User', UserPage),
-	('/GenerateRss', GenerateRssPage)
+	('/GenerateRss', GenerateRssPage),
+	('/SendReminderMail', GenerateReminderMail),
+	('/SearchName', GenerateSearchNamePage),
+	('/SearchAvailability', GenerateSearchAvailabilityPage)
 ], debug=True)

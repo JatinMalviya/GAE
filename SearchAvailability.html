@@ -1,0 +1,138 @@
+<!DOCTYPE html>
+{% autoescape true %}
+
+<html lang="en">
+	<head  >
+		<meta charset="utf-8">
+		<meta http-equiv="X-UA-Compatible" content="IE=edge">
+		<meta name="viewport" content="width=device-width, initial-scale=1">
+		<link rel="shortcut icon" type ="image/x-icon" href="/images/favicon.ico">
+		<title>ReserveBook: Resource Search by Availability</title>
+		<link href="/bootstrap/css/bootstrap.min.css" rel="stylesheet">
+		<link href="/bootstrap/css/ie10-viewport-bug-workaround.css" rel="stylesheet">
+		<link href="navbar-fixed-top.css" rel="stylesheet">
+		<script src="/bootstrap/js/ie-emulation-modes-warning.js"></script>
+	</head>
+	<body>
+  
+		<nav id="navigationbar" class="navbar navbar-inverse navbar-light">
+  
+			<a class="navbar-brand" href="/">ReserveBook</a>
+			<div class="container">
+				<div id="navbar" class="navbar-collapse collapse">
+					<ul class="nav navbar-nav navbar-right">
+						<li><a href="/"><span class="glyphicon glyphicon-home"></span> Home</a></li>
+						<li><a href="#"><span class="glyphicon glyphicon-user"></span> {{ nickname }}</a></li>
+						<li><a href="{{ url_logout|safe }}"><span class="glyphicon glyphicon-log-out"></span> Logout</a></li>
+					</ul>
+				</div>
+			</div>
+		</nav>
+		
+		<div id="Top" class="container">
+
+			<div class="jumbotron" style="background-color: #3c434f; color: white;">
+				<h4> Availability Search </h4>
+				<form name="searchAvailabiltyForm" action="/SearchAvailability" method="post" onsubmit="return validateForm()">
+	 
+					<div class="form-group">
+						<label for="startTime">Start Time*</label>
+						<input type="text" required class="form-control" name="startTime" value="{{ startTime }}" id="startTime" aria-describedby="startTimeHelp" placeholder="HH:MM">
+						<small id="startTimeHelp" class="form-text text-muted">Enter the Start Time for the availabilty search. Must be between 00:00 - 23:59.</small>
+					</div>
+		
+					<div class="form-group">
+						<label for="duration">Duration*</label>
+						<input type="text" required class="form-control" name="duration" value="{{ duration }}" id="duration" aria-describedby="sdurationHelp" placeholder="HH:MM">
+						<small id="durationHelp" class="form-text text-muted">Enter the Duration. Must be between 00:00 - 23:59.</small>
+					</div>
+		
+					<button type="submit" class="btn btn-primary">Submit</button>
+				</form>
+			</div>
+			</div>
+		</div>
+		
+		
+		<div id="results" class="container">
+
+			{% if resources%}
+				<div class="jumbotron">
+					<center><h2>Results</h2></center>
+				</div>
+				<table class="table table-hover table-striped table-responsive">
+					<thead class="thead-default bg-primary text-white">
+						<tr>
+							<th>Resource Name</th>
+							<th>Availability</th>
+							<th>Tags</th>
+							<th>Last Reservation Time</th>
+							<th>Total Bookings</th>
+							{% if rss_flag%}
+								<th>RSS</th>
+							{% endif %}
+						</tr>
+					</thead>
+					<tbody>		
+						{% for resource in resources %}
+							<tr>
+								<th scope="row"><a href="/Resource?resourceId={{ resource.resourceId }}">{{ resource.resourceName }}</a></th>
+								<td>{{ resource.startTime }} - {{ resource.endTime }}</td>
+								<td>{% for tag in resource.tags %} <a href="/Tag?tag={{ tag }}">{{ tag }}</a>{% endfor %}</td>
+								<td>{{ resource.lastReservationTime }}</td>
+								<td>{{ resource.count }}</td>
+								{% if rss_flag%}
+									<td><a class="btn" href="/GenerateRss?resourceId={{ resource.resourceId }}" role="button"><img src="/images/RSS_ICON.png" alt="Generate RSS Feed" height="25" width="25" alt=""></a></td>
+								{% endif %}
+							</tr>
+						{% endfor %}
+
+					</tbody>
+				</table>
+			{% else %}
+				<div class="jumbotron">
+					<center><h3>No Results Found.</h3></center>
+				</div>
+			{% endif %}
+		</div>
+			
+		<script>
+			
+			function validateForm() {
+		
+				var reservationStartTime = document.forms["searchAvailabiltyForm"]["startTime"].value;
+				var reservationStartTimeFormat = /^[0-2][0-9]:[0-5][0-9]$/;
+				if(!reservationStartTime.match(reservationStartTimeFormat)) {
+					alert("Wrong Format for Start Time. Must be between 00:00 - 23:59 and in format HH:MM.");
+					return false;
+				}
+						
+				var duration = document.forms["searchAvailabiltyForm"]["duration"].value;
+				var durationFormat = /^[0-2][0-9]:[0-5][0-9]$/;
+				if(!duration.match(durationFormat)) {
+					alert("Wrong Format for Duration time. Must be between 00:00 - 23:59 and in format HH:MM.");
+					return false;
+				}
+				
+				var reservationStartHour = parseInt(reservationStartTime.split(':')[0]);
+				var reservationStartMin = parseInt(reservationStartTime.split(':')[1]);
+				var reservationEndHour = reservationStartHour + parseInt(duration.split(':')[0]);
+				var reservationEndMin = reservationStartMin + parseInt(duration.split(':')[1]);
+				
+				if(reservationEndMin >= 60) {
+				
+					reservationEndHour = reservationEndHour + 1;
+					reservationEndMin = reservationEndMin - 60;
+				} 
+				
+				if(reservationEndHour > 23) {
+					alert("Availability search cannot cross Day Boundary. Check Duration.");
+					return false;
+				}
+				
+			}
+		</script>
+		
+  </body>
+</html>
+{% endautoescape %}
