@@ -355,7 +355,7 @@ class AddReservationPage(webapp2.RequestHandler):
 				message.body = """Hi """ + user.nickname() + """,
 Your reservation for """ + resource.resourceName + """ at """ + str(reservation.startTime) + """ - """ + str(reservation.endTime) + """ has been Confirmed.
 Thanks.
-ReserveBook"""
+ReserveBook (jm6474@nyu.edu)"""
 
 				message.send();
 			
@@ -498,7 +498,7 @@ class GenerateReminderMail(webapp2.RequestHandler):
 			message.body = """Hi,
 Your reservation for """ + reservation.resourceName + """ is starting Now.
 Thanks.
-ReserveBook"""
+ReserveBook (jm6474@nyu.edu)"""
 			
 			message.send();
 			
