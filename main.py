@@ -357,7 +357,10 @@ Your reservation for """ + resource.resourceName + """ at """ + str(reservation.
 Thanks.
 ReserveBook (jm6474@nyu.edu)"""
 
-				message.send();
+				try:
+					message.send();
+				except:
+					logging.info(message);
 			
 				self.redirect('/');
 			
@@ -500,8 +503,10 @@ Your reservation for """ + reservation.resourceName + """ is starting Now.
 Thanks.
 ReserveBook (jm6474@nyu.edu)"""
 			
-			message.send();
-			
+			try:
+				message.send();
+			except:
+				logging.info(message);
 			
 			
 class GenerateSearchNamePage(webapp2.RequestHandler):
