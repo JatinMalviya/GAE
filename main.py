@@ -9,7 +9,7 @@ from google.appengine.api import users
 from google.appengine.ext import ndb
 from google.appengine.api import mail
 
-RSS_FLAG = True;
+RSS_FLAG = False;
 
 JINJA_ENVIRONMENT = jinja2.Environment(
     loader=jinja2.FileSystemLoader(os.path.dirname(__file__)),
